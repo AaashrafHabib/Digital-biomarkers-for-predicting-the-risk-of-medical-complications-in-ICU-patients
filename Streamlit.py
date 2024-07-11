@@ -2,8 +2,10 @@ import streamlit as st
 import tensorflow as tf
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from Preprocessing import static_scale, dynamic_scale
 from streamlit_option_menu import option_menu
+import time
 
 # Load the saved model
 model = tf.keras.models.load_model('best_model_loss.h5')
@@ -82,36 +84,41 @@ if selected == "Training":
         prediction = model.predict([timeseries_input, static_input])
         st.write(f"Prediction: {prediction[0][0]:.4f}")
 
-
-
-    
-
 if selected == 'Data Viz':
-     st.header('Stroke Prediction App')
-    # Create a row layout
-     c1, c2 = st.columns(2)
-     c3, c4 = st.columns(2)
+    st.header('Data Visualization')
 
-     with st.container():
-        c1.write("c1")
-        c2.write("c2")
+    # Load the locally stored DataFrame
+    data_path = st.text_input('Enter the path of your data file:')
+    if data_path:
+        try:
+            df = pd.read_csv(data_path)  # Assuming the file is a CSV
+            st.write(df.head())
+            
+            # Visualizations
 
-     with st.container():
-        c3.write("c3")
-        c4.write("c4")
+            # Number of patients
+            num_patients = df['SUBJECT_ID'].nunique()
+            st.write(f"Number of patients: {num_patients}")
 
-     with c1:
-        chart_data = pd.DataFrame(np.random.randn(20, 3), columns=['a', 'b', 'c'])
-        st.area_chart(chart_data)
+            # Average hospitalization time
+            hospitalization_time = df.groupby('HADM_ID').size().mean()
+            st.write(f"Average hospitalization time: {hospitalization_time:.2f} timesteps")
 
-     with c2:
-        chart_data = pd.DataFrame(np.random.randn(20, 3), columns=["a", "b", "c"])
-        st.bar_chart(chart_data)
+            # Real-time Heart Rate for a selected patient
+            selected_patient = st.selectbox('Select Patient ID', df['SUBJECT_ID'].unique())
+            if selected_patient:
+                patient_data = df[df['SUBJECT_ID'] == selected_patient]
+                heart_rate_data = patient_data[['HADM_ID', 'Heart Rate']].set_index('HADM_ID')
 
-     with c3:
-        chart_data = pd.DataFrame(np.random.randn(20, 3), columns=['a', 'b', 'c'])
-        st.line_chart(chart_data)
-
-     with c4:
-        chart_data = pd.DataFrame(np.random.randn(20, 3), columns=['a', 'b', 'c'])
-        st.line_chart(chart_data)
+                st.subheader('Real-time Heart Rate')
+                placeholder = st.empty()
+                for _ in range(100):
+                    heart_rate_data = heart_rate_data.append(
+                        pd.DataFrame({'Heart Rate': [np.random.randn()]}, index=[heart_rate_data.index[-1] + 1])
+                    )
+                    heart_rate_data = heart_rate_data.iloc[-100:]
+                    with placeholder.container():
+                        st.line_chart(heart_rate_data)
+                    time.sleep(0.1)  # Update every 100 ms
+        except Exception as e:
+            st.error(f"Error loading data: {e}")
