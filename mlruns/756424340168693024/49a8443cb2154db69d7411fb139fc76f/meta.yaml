@@ -1,0 +1,15 @@
+artifact_uri: file:///F:/MLOPS/mlruns/756424340168693024/49a8443cb2154db69d7411fb139fc76f/artifacts
+end_time: 1720824041471
+entry_point_name: ''
+experiment_id: '756424340168693024'
+lifecycle_stage: active
+run_id: 49a8443cb2154db69d7411fb139fc76f
+run_name: angry-shad-400
+run_uuid: 49a8443cb2154db69d7411fb139fc76f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1720824041419
+status: 4
+tags: []
+user_id: Lenovo

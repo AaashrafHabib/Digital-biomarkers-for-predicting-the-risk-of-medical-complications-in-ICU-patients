@@ -1,0 +1,15 @@
+artifact_uri: file:///F:/MLOPS/mlruns/756424340168693024/1e782faee4be4052b3c7c106a81b373f/artifacts
+end_time: 1720826325893
+entry_point_name: ''
+experiment_id: '756424340168693024'
+lifecycle_stage: active
+run_id: 1e782faee4be4052b3c7c106a81b373f
+run_name: defiant-robin-168
+run_uuid: 1e782faee4be4052b3c7c106a81b373f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1720825343649
+status: 3
+tags: []
+user_id: Lenovo

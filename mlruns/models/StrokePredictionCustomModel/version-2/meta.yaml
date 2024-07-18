@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1720833398350
+current_stage: None
+description: null
+last_updated_timestamp: 1720833398350
+name: StrokePredictionCustomModel
+run_id: 9dde3baca36b4fe6af6f77a26cb77346
+run_link: null
+source: file:///F:/MLOPS/mlruns/756424340168693024/9dde3baca36b4fe6af6f77a26cb77346/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///F:/MLOPS/mlruns/756424340168693024/9dde3baca36b4fe6af6f77a26cb77346/artifacts/model
+user_id: null
+version: 2

@@ -1,0 +1,15 @@
+artifact_uri: file:///F:/MLOPS/mlruns/756424340168693024/b0689a7204674d0eaee335535fa431a1/artifacts
+end_time: 1720828709206
+entry_point_name: ''
+experiment_id: '756424340168693024'
+lifecycle_stage: active
+run_id: b0689a7204674d0eaee335535fa431a1
+run_name: kindly-hog-234
+run_uuid: b0689a7204674d0eaee335535fa431a1
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1720827972383
+status: 4
+tags: []
+user_id: Lenovo

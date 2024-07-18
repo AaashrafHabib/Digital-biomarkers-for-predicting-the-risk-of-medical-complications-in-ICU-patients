@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1720831156356
+current_stage: None
+description: null
+last_updated_timestamp: 1720831156356
+name: Custom_Model
+run_id: fb2b9d5a969440d48db64decfa32d30d
+run_link: null
+source: file:///F:/MLOPS/mlruns/756424340168693024/fb2b9d5a969440d48db64decfa32d30d/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///F:/MLOPS/mlruns/756424340168693024/fb2b9d5a969440d48db64decfa32d30d/artifacts/model
+user_id: null
+version: 1

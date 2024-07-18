@@ -1,0 +1,15 @@
+artifact_uri: file:///F:/MLOPS/mlruns/756424340168693024/fb2b9d5a969440d48db64decfa32d30d/artifacts
+end_time: 1720831190572
+entry_point_name: ''
+experiment_id: '756424340168693024'
+lifecycle_stage: active
+run_id: fb2b9d5a969440d48db64decfa32d30d
+run_name: welcoming-loon-102
+run_uuid: fb2b9d5a969440d48db64decfa32d30d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1720830865271
+status: 3
+tags: []
+user_id: Lenovo

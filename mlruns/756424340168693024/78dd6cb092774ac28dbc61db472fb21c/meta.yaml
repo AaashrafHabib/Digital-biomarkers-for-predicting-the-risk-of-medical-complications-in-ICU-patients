@@ -1,0 +1,15 @@
+artifact_uri: file:///F:/MLOPS/mlruns/756424340168693024/78dd6cb092774ac28dbc61db472fb21c/artifacts
+end_time: 1720823969570
+entry_point_name: ''
+experiment_id: '756424340168693024'
+lifecycle_stage: active
+run_id: 78dd6cb092774ac28dbc61db472fb21c
+run_name: spiffy-owl-993
+run_uuid: 78dd6cb092774ac28dbc61db472fb21c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1720823969433
+status: 4
+tags: []
+user_id: Lenovo

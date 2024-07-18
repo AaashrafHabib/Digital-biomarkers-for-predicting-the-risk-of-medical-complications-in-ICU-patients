@@ -1,0 +1,15 @@
+artifact_uri: file:///F:/MLOPS/mlruns/756424340168693024/9dde3baca36b4fe6af6f77a26cb77346/artifacts
+end_time: 1720833398642
+entry_point_name: ''
+experiment_id: '756424340168693024'
+lifecycle_stage: active
+run_id: 9dde3baca36b4fe6af6f77a26cb77346
+run_name: indecisive-lark-843
+run_uuid: 9dde3baca36b4fe6af6f77a26cb77346
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1720832442484
+status: 3
+tags: []
+user_id: Lenovo

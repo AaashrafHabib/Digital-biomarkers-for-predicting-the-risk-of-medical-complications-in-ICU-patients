@@ -6,9 +6,20 @@ import matplotlib.pyplot as plt
 from Preprocessing import static_scale, dynamic_scale
 from streamlit_option_menu import option_menu
 import time
+import mlflow
+import mlflow.keras
+
 
 # Load the saved model
-model = tf.keras.models.load_model('best_model_loss.h5')
+# model = tf.keras.models.load_model('best_model_loss.h5')
+
+# Specify the model name and version
+model_name = "StrokePredictionCustomModel"
+model_version = 3
+# Load the model
+model = mlflow.pyfunc.load_model(
+    model_uri=f"models:/{model_name}/{model_version}"
+)
 
 # Define input fields for the Streamlit app
 st.title("Stroke Prediction")
@@ -120,5 +131,68 @@ if selected == 'Data Viz':
                     with placeholder.container():
                         st.line_chart(heart_rate_data)
                     time.sleep(0.1)  # Update every 100 ms
+
+            # Additional Visualizations
+
+            # Age distribution
+            st.subheader('Age Distribution')
+            plt.figure(figsize=(10, 6))
+            plt.hist(df['AGE'], bins=20, color='skyblue', edgecolor='black')
+            plt.xlabel('Age')
+            plt.ylabel('Frequency')
+            plt.title('Distribution of Ages')
+            st.pyplot(plt)
+
+            # Gender distribution
+            st.subheader('Gender Distribution')
+            gender_counts = df['GENDER'].value_counts()
+            st.bar_chart(gender_counts)
+
+            # Blood pressure analysis by age
+            st.subheader('Blood Pressure by Age')
+            fig, ax = plt.subplots(figsize=(10, 6))
+            for bp_type in ['Non Invasive Blood Pressure diastolic', 'Non Invasive Blood Pressure mean', 'Non Invasive Blood Pressure systolic']:
+                ax.plot(df['AGE'], df[bp_type], label=bp_type)
+            ax.set_xlabel('Age')
+            ax.set_ylabel('Blood Pressure')
+            ax.set_title('Blood Pressure by Age')
+            ax.legend()
+            st.pyplot(fig)
+
+            # Vital parameters over time for a selected patient
+            st.subheader('Vital Parameters Over Time')
+            if selected_patient:
+                vitals = ['Heart Rate', 'Non Invasive Blood Pressure diastolic', 'Non Invasive Blood Pressure mean', 'Non Invasive Blood Pressure systolic', 'Respiratory Rate']
+                fig, ax = plt.subplots(figsize=(10, 6))
+                for vital in vitals:
+                    ax.plot(patient_data['HADM_ID'], patient_data[vital], label=vital)
+                ax.set_xlabel('Time')
+                ax.set_ylabel('Value')
+                ax.set_title(f'Vital Parameters Over Time for Patient {selected_patient}')
+                ax.legend()
+                st.pyplot(fig)
+
+            # Stroke and anomaly analysis
+            st.subheader('Stroke and Anomaly Analysis')
+            stroke_counts = df['stroke'].value_counts()
+            tachycardia_counts = df['Tachycardia'].value_counts()
+            bradycardia_counts = df['Bradycardia'].value_counts()
+            hypertension_counts = df['Hypertension'].value_counts()
+            hypotension_counts = df['Hypotension'].value_counts()
+            tachypnea_counts = df['Tachypnea'].value_counts()
+            bradypnea_counts = df['Bradypnea'].value_counts()
+
+            anomalies = pd.DataFrame({
+                'Stroke': stroke_counts,
+                'Tachycardia': tachycardia_counts,
+                'Bradycardia': bradycardia_counts,
+                'Hypertension': hypertension_counts,
+                'Hypotension': hypotension_counts,
+                'Tachypnea': tachypnea_counts,
+                'Bradypnea': bradypnea_counts
+            }).fillna(0).astype(int)
+
+            st.bar_chart(anomalies)
+
         except Exception as e:
             st.error(f"Error loading data: {e}")

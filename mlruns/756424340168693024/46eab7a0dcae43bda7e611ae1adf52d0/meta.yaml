@@ -1,0 +1,15 @@
+artifact_uri: file:///F:/MLOPS/mlruns/756424340168693024/46eab7a0dcae43bda7e611ae1adf52d0/artifacts
+end_time: 1721142420051
+entry_point_name: ''
+experiment_id: '756424340168693024'
+lifecycle_stage: active
+run_id: 46eab7a0dcae43bda7e611ae1adf52d0
+run_name: flawless-pug-154
+run_uuid: 46eab7a0dcae43bda7e611ae1adf52d0
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1721141843643
+status: 3
+tags: []
+user_id: Lenovo
