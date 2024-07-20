@@ -174,6 +174,7 @@ with mlflow.start_run() as run:
     # Confusion matrix
     preds = model.predict([X_test[:,:,4:], X_test_static])
     preds = (preds > 0.5).astype(int)  # Thresholding
+    print(f"{preds[0]}")
     cm = confusion_matrix(y_test, preds)
     plt.figure(figsize=(6, 6))
     sns.heatmap(cm, annot=True, fmt="d", cmap='Blues')
