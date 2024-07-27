@@ -10,6 +10,8 @@ from keras_tuner import RandomSearch
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.metrics import explained_variance_score, mean_squared_error, r2_score
+import seaborn as sns
+import time
 
 # Load the saved model
 model = tf.keras.models.load_model('best_model_loss.h5')
@@ -263,6 +265,8 @@ if selected == "Training":
             st.write(f"R2: {model_metrics[model]['R2']:.2f}")
             st.write("")
 
+# Data Visualization Section
+selected = 'Data Viz'  # Assuming you are running this block based on some condition
 if selected == 'Data Viz':
     st.header('Data Visualization')
 
@@ -272,6 +276,7 @@ if selected == 'Data Viz':
     if data_path:
         try:
             df = pd.read_csv(data_path)  # Assuming the file is a CSV
+            df.index = pd.to_datetime(df.index)  # Assuming the index is the CHARTTIME
             st.write(df.head())
 
             # Number of patients
@@ -284,32 +289,33 @@ if selected == 'Data Viz':
 
             # Real-time vital signs for a selected patient
             selected_patient = st.selectbox('Select Patient ID', df['SUBJECT_ID'].unique())
-            selected_vital_sign = st.selectbox('Select Vital Sign to Visualize',
-                                               ['Heart Rate',
-                                                'Non Invasive Blood Pressure diastolic',
-                                                'Non Invasive Blood Pressure mean',
-                                                'Non Invasive Blood Pressure systolic',
-                                                'Respiratory Rate'])
             if selected_patient:
                 patient_data = df[df['SUBJECT_ID'] == selected_patient]
-                vital_sign_data = patient_data[['HADM_ID', selected_vital_sign]].set_index('HADM_ID')
 
-                st.subheader(f'Real-time {selected_vital_sign}')
-                placeholder = st.empty()
-                for _ in range(100):
-                    new_data = pd.DataFrame({
-                        selected_vital_sign: [np.random.randn()]
-                    }, index=[vital_sign_data.index[-1] + 1])
+                # List all hospitalizations for the selected patient
+                hospitalizations = patient_data['HADM_ID'].unique()
+                selected_hospitalization = st.selectbox('Select Hospitalization ID', hospitalizations)
+                if selected_hospitalization:
+                    hospitalization_data = patient_data[patient_data['HADM_ID'] == selected_hospitalization]
+                    hospitalization_data = hospitalization_data.set_index('CHARTTIME')
 
-                    vital_sign_data = pd.concat([vital_sign_data, new_data])
-                    vital_sign_data = vital_sign_data.iloc[-100:]
+                    # Select vital sign to visualize
+                    selected_vital_sign = st.selectbox('Select Vital Sign to Visualize',
+                                                       ['Heart Rate',
+                                                        'Non Invasive Blood Pressure diastolic',
+                                                        'Non Invasive Blood Pressure mean',
+                                                        'Non Invasive Blood Pressure systolic',
+                                                        'Respiratory Rate'])
+                    if selected_vital_sign:
+                        st.subheader(f'{selected_vital_sign} Variation Over Time')
+                        fig, ax = plt.subplots(figsize=(10, 6))
+                        ax.plot(hospitalization_data.index, hospitalization_data[selected_vital_sign], label=selected_vital_sign)
+                        ax.set_xlabel('Time')
+                        ax.set_ylabel('Value')
+                        ax.set_title(f'{selected_vital_sign} Variation for Patient {selected_patient} during Hospitalization {selected_hospitalization}')
+                        ax.legend()
+                        st.pyplot(fig)
 
-                    with placeholder.container():
-                        st.line_chart(vital_sign_data)
-
-                    time.sleep(0.1)  # Update every 100 ms
-
-                # Additional Visualizations
         except Exception as e:
             st.error(f"Error loading data: {e}")
 
@@ -317,21 +323,6 @@ if selected == 'Data Viz':
         c1, c2 = st.columns(2)
 
         with c1:
-            # Vital parameters over time for a selected patient
-            st.subheader('Vital Parameters Over Time')
-            if 'selected_patient' in locals():
-                vitals = ['Heart Rate', 'Non Invasive Blood Pressure diastolic', 'Non Invasive Blood Pressure mean',
-                          'Non Invasive Blood Pressure systolic', 'Respiratory Rate']
-                fig, ax = plt.subplots(figsize=(10, 6))
-                for vital in vitals:
-                    ax.plot(patient_data['HADM_ID'], patient_data[vital], label=vital)
-                ax.set_xlabel('Time')
-                ax.set_ylabel('Value')
-                ax.set_title(f'Vital Parameters Over Time for Patient {selected_patient}')
-                ax.legend()
-                st.pyplot(fig)
-
-        with c2:
             # Age distribution
             st.subheader('Age Distribution')
             plt.figure(figsize=(10, 6))
@@ -341,18 +332,23 @@ if selected == 'Data Viz':
             plt.title('Distribution of Ages')
             st.pyplot(plt)
 
+        with c2:
+            # Gender distribution
+            st.subheader('Gender Distribution')
+            fig, ax = plt.subplots(figsize=(10, 6))
+            gender_counts = df['GENDER'].value_counts()
+            ax.bar(gender_counts.index, gender_counts.values, color='skyblue', edgecolor='black')
+            ax.set_xlabel('Gender')
+            ax.set_ylabel('Count')
+            ax.set_title('Gender Distribution')
+            st.pyplot(fig)
+
         c3, c4 = st.columns(2)
 
         with c3:
-            # Gender distribution
-            st.subheader('Gender Distribution')
-            gender_counts = df['GENDER'].value_counts()
-            st.bar_chart(gender_counts)
-
-        with c4:
             # Blood pressure analysis by age
             st.subheader('Blood Pressure by Age')
-            fig, ax = plt.subplots(figsize=(10, 6))
+            fig, ax = plt.subplots(figsize=(12, 8))  # Adjusted to match the density plots' size
             for bp_type in ['Non Invasive Blood Pressure diastolic', 'Non Invasive Blood Pressure mean',
                             'Non Invasive Blood Pressure systolic']:
                 ax.plot(df['AGE'], df[bp_type], label=bp_type)
@@ -362,27 +358,51 @@ if selected == 'Data Viz':
             ax.legend()
             st.pyplot(fig)
 
+        with c4:
+            # Density plots for Respiratory Rate and Admission Weight
+            st.subheader('Density Plots')
+            fig, ax = plt.subplots(1, 2, figsize=(12, 8))  # Adjusted to match the blood pressure plot's size
+
+            sns.kdeplot(df['Respiratory Rate'], ax=ax[0], color='blue')
+            ax[0].set_title('Density of Respiratory Rate')
+            ax[0].set_xlabel('Respiratory Rate')
+            ax[0].set_ylabel('Density')
+
+            sns.kdeplot(df['Admission Weight (Kg)'], ax=ax[1], color='green')
+            ax[1].set_title('Density of Admission Weight')
+            ax[1].set_xlabel('Admission Weight (Kg)')
+            ax[1].set_ylabel('Density')
+
+            st.pyplot(fig)
         c5, c6 = st.columns(2)
 
         with c5:
+            # Gender distribution
+            st.subheader('Gender Distribution')
+            fig, ax = plt.subplots(figsize=(10, 6))
+            gender_counts = df['GENDER'].value_counts()
+            ax.bar(gender_counts.index, gender_counts.values, color='skyblue', edgecolor='black')
+            ax.set_xlabel('Gender')
+            ax.set_ylabel('Count')
+            ax.set_title('Gender Distribution')
+            st.pyplot(fig)
             # Stroke and anomaly analysis
             st.subheader('Stroke and Anomaly Analysis')
+            fig, ax = plt.subplots(figsize=(10, 6))
             stroke_counts = df['stroke'].value_counts()
-            tachycardia_counts = df['Tachycardia'].value_counts()
-            bradycardia_counts = df['Bradycardia'].value_counts()
-            hypertension_counts = df['Hypertension'].value_counts()
-            hypotension_counts = df['Hypotension'].value_counts()
-            tachypnea_counts = df['Tachypnea'].value_counts()
-            bradypnea_counts = df['Bradypnea'].value_counts()
-
-            anomalies = pd.DataFrame({
-                'Stroke': stroke_counts,
-                'Tachycardia': tachycardia_counts,
-                'Bradycardia': bradycardia_counts,
-                'Hypertension': hypertension_counts,
-                'Hypotension': hypotension_counts,
-                'Tachypnea': tachypnea_counts,
-                'Bradypnea': bradypnea_counts
-            }).fillna(0).astype(int)
-
-            st.bar_chart(anomalies)
+            ax.bar(stroke_counts.index,stroke_counts.values,color='skyblue', edgecolor='black')
+            ax.set_xlabel('stroke')
+            ax.set_ylabel('Count')
+            ax.set_title('Stroke Distribution')
+            
+        with c6 :
+         # Age distribution comparison between positive and negative cases
+           st.subheader('Age Distribution: Positive vs Negative Cases')
+           df['Status'] = df['stroke'].apply(lambda x: 'positive' if x == 1 else 'negative')
+           plt.figure(figsize=(10, 6))
+           sns.histplot(data=df, x='AGE', hue='Status', kde=True, stat="density", common_norm=False, palette=['#1f77b4', '#ff7f0e'])
+           plt.xlabel('AGE')
+           plt.ylabel('Density')
+           plt.title('Age Distribution')
+           plt.legend(title='Status', labels=['positive', 'negative'])
+           st.pyplot(plt)
