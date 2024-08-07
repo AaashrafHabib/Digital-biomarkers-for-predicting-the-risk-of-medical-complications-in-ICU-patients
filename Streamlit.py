@@ -1,5 +1,4 @@
 import streamlit as st
-import tensorflow as tf
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,7 +13,7 @@ import seaborn as sns
 import time
 
 # Load the saved model
-model = tf.keras.models.load_model('best_model_loss.h5')
+# model = tf.keras.models.load_model('best_model_loss.h5')
 
 # Define input fields for the Streamlit app
 st.title("Digital biomarkers for predicting the risk of medical complications in ICU patients")
