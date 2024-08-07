@@ -17,8 +17,8 @@ import time
 model = tf.keras.models.load_model('best_model_loss.h5')
 
 # Define input fields for the Streamlit app
-st.title("Stroke Prediction")
-st.write("Please enter the following information:")
+st.title("Digital biomarkers for predicting the risk of medical complications in ICU patients")
+st.write("Welcome ! ")
 
 # Sidebar for navigation
 with st.sidebar:
@@ -38,118 +38,6 @@ def get_last_timestamp(patient_data):
 
 if selected == "Training":
     st.header('Training')
-
-    patient_selection = st.radio("Select patient from:", ('Existing patients', 'New patient'))
-    
-    if patient_selection == 'Existing patients':
-        # Load and select patient data
-        data_path = st.text_input('Enter the path of your data file:')
-        df = load_data(data_path) if data_path else None
-        
-        if df is not None:
-            patient_ids = df['SUBJECT_ID'].unique()
-            selected_patient = st.selectbox('Select Patient ID', patient_ids)
-            
-            if selected_patient:
-                # patient_data = df[df['SUBJECT_ID'] == selected_patient]
-                # last_timestamp = get_last_timestamp(patient_data)
-                # st.write(f"Last measurement was on: {last_timestamp}")
-                
-                prediction_day = st.date_input('Select the day for prediction')
-                # prediction_timestamp = (prediction_day - pd.to_datetime(last_timestamp)).days
-                
-                # st.write(f"Predicting for {prediction_timestamp} days ahead")
-
-                # for t in range(last_timestamp, last_timestamp + prediction_timestamp):
-                #     st.write(f"Timestep {t + 1}")
-                #     dynamic_col1, dynamic_col2 = st.columns(2)
-                #     with dynamic_col1:
-                #         for key in ['Heart Rate', 'Non Invasive Blood Pressure diastolic']:
-                #             value = st.number_input(f'{key} (Timestep {t + 1})', min_value=0.0, max_value=200.0, step=0.1,
-                #                                     key=f"{key}_{t}")
-                #             timeseries_data[key].append(value)
-                #     with dynamic_col2:
-                #         for key in ['Non Invasive Blood Pressure mean', 'Non Invasive Blood Pressure systolic', 'Respiratory Rate']:
-                #             value = st.number_input(f'{key} (Timestep {t + 1})', min_value=0.0, max_value=200.0, step=0.1,
-                #                                     key=f"{key}_{t}")
-                #             timeseries_data[key].append(value)
-
-                # Add fake HADM_ID column and preprocess
-                # dynamic_df = pd.DataFrame(timeseries_data)
-                # dynamic_df['HADM_ID'] = 1
-
-                # # Preprocess the input data
-                # dynamic_df = dynamic_scale(dynamic_df)
-                # dynamic_df = dynamic_df.drop(columns=['HADM_ID'])
-
-                # # Convert to numpy arrays
-                # timeseries_input = dynamic_df.values.reshape(1, prediction_timestamp, -1)
-                
-                # Further processing can be added here based on the model requirements
-                
-        else:
-            st.error("Please provide a valid data path.")
-
-    elif patient_selection == 'New patient':
-        # Static input fields for new patient
-        st.subheader('Static Input Fields')
-        static_col1, static_col2 = st.columns(2)
-        with static_col1:
-            age = st.number_input('Age', min_value=0, max_value=120, step=1)
-        with static_col2:
-            weight = st.number_input('Admission Weight (Kg)', min_value=0.0, max_value=200.0, step=0.1)
-        static_col3, static_col4 = st.columns(2)
-        with static_col3:
-            height = st.number_input('Height (cm)', min_value=0.0, max_value=250.0, step=0.1)
-        static_input = [age, weight, height]
-
-        prediction_days = st.slider('Number of days to predict', min_value=1, max_value=10, value=6)
-
-        # Dynamic input fields for new patient
-        st.subheader('Dynamic Input Fields')
-        timeseries_data = {
-            'Heart Rate': [],
-            'Non Invasive Blood Pressure diastolic': [],
-            'Non Invasive Blood Pressure mean': [],
-            'Non Invasive Blood Pressure systolic': [],
-            'Respiratory Rate': []
-        }
-
-        for t in range(prediction_days):
-            st.write(f"Timestep {t + 1}")
-            dynamic_col1, dynamic_col2 = st.columns(2)
-            with dynamic_col1:
-                for key in ['Heart Rate', 'Non Invasive Blood Pressure diastolic']:
-                    value = st.number_input(f'{key} (Timestep {t + 1})', min_value=0.0, max_value=200.0, step=0.1,
-                                            key=f"{key}_{t}")
-                    timeseries_data[key].append(value)
-            with dynamic_col2:
-                for key in ['Non Invasive Blood Pressure mean', 'Non Invasive Blood Pressure systolic', 'Respiratory Rate']:
-                    value = st.number_input(f'{key} (Timestep {t + 1})', min_value=0.0, max_value=200.0, step=0.1,
-                                            key=f"{key}_{t}")
-                    timeseries_data[key].append(value)
-
-        # Convert inputs to DataFrame
-        static_df = pd.DataFrame([static_input], columns=["AGE", 'Admission Weight (Kg)', "Height (cm)"])
-        dynamic_df = pd.DataFrame(timeseries_data)
-
-        # Add a fake HADM_ID column to use the dynamic_scale function
-        dynamic_df['HADM_ID'] = 1
-
-        # Preprocess the input data
-        static_df, scaler = static_scale(static_df)
-        dynamic_df = dynamic_scale(dynamic_df)
-
-        # Drop the fake HADM_ID column
-        dynamic_df = dynamic_df.drop(columns=['HADM_ID'])
-
-        # Convert to numpy arrays
-        static_input = static_df.values
-        timeseries_input = dynamic_df.values.reshape(1, prediction_days, -1)
-        
-        # Further processing can be added here based on the model requirements
-
-
     # Model selection
     model_selection = st.selectbox(
         'Select a Model',
@@ -164,7 +52,41 @@ if selected == "Training":
         st.subheader('Hyperparameter Tuning')
         tune_neurons = st.slider('Number of Neurons in Hidden Layer', min_value=32, max_value=512, step=32, value=128)
         tune_epochs = st.slider('Number of Training Epochs', min_value=5, max_value=100, step=5, value=20)
+        # Add the image of the LSTM architecture
+        st.subheader('LSTM Model Architecture')
+        st.image('Ressources/lstm_plot.png', caption='LSTM Model Architecture')
         
+        # Add the summary of the LSTM model from a .txt file
+        st.subheader('LSTM Model Summary')
+        with open('Ressources/lstm_summary.txt', 'r', encoding='utf-8') as file:
+            model_summary = file.read()
+        st.text(model_summary)
+    if model_selection == 'GRU (Gated Recurrent Unit)':
+        st.subheader('Hyperparameter Tuning')
+        tune_neurons = st.slider('Number of Neurons in Hidden Layer', min_value=32, max_value=512, step=32, value=128)
+        tune_epochs = st.slider('Number of Training Epochs', min_value=5, max_value=100, step=5, value=20)
+        # Add the image of the LSTM architecture
+        st.subheader('GRU Model Architecture')
+        st.image('Ressources/gru_plot (1).png', caption='GRU Model Architecture')
+        
+        # Add the summary of the LSTM model from a .txt file
+        st.subheader('GRU Model Summary')
+        with open('Ressources/gru_summary.txt', 'r', encoding='utf-8') as file:
+            model_summary = file.read()
+        st.text(model_summary)
+    if model_selection == 'Custom Model':
+        st.subheader('Hyperparameter Tuning')
+        tune_neurons = st.slider('Number of Neurons in Hidden Layer', min_value=32, max_value=512, step=32, value=128)
+        tune_epochs = st.slider('Number of Training Epochs', min_value=5, max_value=100, step=5, value=20)
+        # Add the image of the LSTM architecture
+        st.subheader('Custom Model Architecture')
+        st.image('Ressources/custom_plot.png', caption='Custom Model Architecture')
+        
+        # Add the summary of the LSTM model from a .txt file
+        st.subheader('Custom  Model Summary')
+        with open('Ressources/custom_summary.txt', 'r', encoding='utf-8') as file:
+            model_summary = file.read()
+        st.text(model_summary) 
     # Mock data for demonstration purposes
     y_true = np.random.rand(100)
     y_pred_nn = y_true + np.random.normal(0, 0.05, 100)
@@ -266,7 +188,6 @@ if selected == "Training":
             st.write("")
 
 # Data Visualization Section
-selected = 'Data Viz'  # Assuming you are running this block based on some condition
 if selected == 'Data Viz':
     st.header('Data Visualization')
 
@@ -406,3 +327,114 @@ if selected == 'Data Viz':
            plt.title('Age Distribution')
            plt.legend(title='Status', labels=['positive', 'negative'])
            st.pyplot(plt)
+if selected == "Deploying": 
+     st.header('Predicting')
+
+     patient_selection = st.radio("Select patient from:", ('Existing patients', 'New patient'))
+    
+     if patient_selection == 'Existing patients':
+        # Load and select patient data
+        data_path = st.text_input('Enter the path of your data file:')
+        df = load_data(data_path) if data_path else None
+        
+        if df is not None:
+            patient_ids = df['SUBJECT_ID'].unique()
+            selected_patient = st.selectbox('Select Patient ID', patient_ids)
+            
+            if selected_patient:
+                # patient_data = df[df['SUBJECT_ID'] == selected_patient]
+                # last_timestamp = get_last_timestamp(patient_data)
+                # st.write(f"Last measurement was on: {last_timestamp}")
+                
+                prediction_day = st.date_input('Select the day for prediction')
+                # prediction_timestamp = (prediction_day - pd.to_datetime(last_timestamp)).days
+                
+                # st.write(f"Predicting for {prediction_timestamp} days ahead")
+
+                # for t in range(last_timestamp, last_timestamp + prediction_timestamp):
+                #     st.write(f"Timestep {t + 1}")
+                #     dynamic_col1, dynamic_col2 = st.columns(2)
+                #     with dynamic_col1:
+                #         for key in ['Heart Rate', 'Non Invasive Blood Pressure diastolic']:
+                #             value = st.number_input(f'{key} (Timestep {t + 1})', min_value=0.0, max_value=200.0, step=0.1,
+                #                                     key=f"{key}_{t}")
+                #             timeseries_data[key].append(value)
+                #     with dynamic_col2:
+                #         for key in ['Non Invasive Blood Pressure mean', 'Non Invasive Blood Pressure systolic', 'Respiratory Rate']:
+                #             value = st.number_input(f'{key} (Timestep {t + 1})', min_value=0.0, max_value=200.0, step=0.1,
+                #                                     key=f"{key}_{t}")
+                #             timeseries_data[key].append(value)
+
+                # Add fake HADM_ID column and preprocess
+                # dynamic_df = pd.DataFrame(timeseries_data)
+                # dynamic_df['HADM_ID'] = 1
+
+                # # Preprocess the input data
+                # dynamic_df = dynamic_scale(dynamic_df)
+                # dynamic_df = dynamic_df.drop(columns=['HADM_ID'])
+
+                # # Convert to numpy arrays
+                # timeseries_input = dynamic_df.values.reshape(1, prediction_timestamp, -1)
+                
+                # Further processing can be added here based on the model requirements
+                
+        else:
+            st.error("Please provide a valid data path.")
+
+     elif patient_selection == 'New patient':
+        # Static input fields for new patient
+        st.subheader('Static Input Fields')
+        static_col1, static_col2 = st.columns(2)
+        with static_col1:
+            age = st.number_input('Age', min_value=0, max_value=120, step=1)
+        with static_col2:
+            weight = st.number_input('Admission Weight (Kg)', min_value=0.0, max_value=200.0, step=0.1)
+        static_col3, static_col4 = st.columns(2)
+        with static_col3:
+            height = st.number_input('Height (cm)', min_value=0.0, max_value=250.0, step=0.1)
+        static_input = [age, weight, height]
+
+        prediction_days = st.slider('Number of days to predict', min_value=1, max_value=10, value=6)
+
+        # Dynamic input fields for new patient
+        st.subheader('Dynamic Input Fields')
+        timeseries_data = {
+            'Heart Rate': [],
+            'Non Invasive Blood Pressure diastolic': [],
+            'Non Invasive Blood Pressure mean': [],
+            'Non Invasive Blood Pressure systolic': [],
+            'Respiratory Rate': []
+        }
+
+        for t in range(prediction_days):
+            st.write(f"Timestep {t + 1}")
+            dynamic_col1, dynamic_col2 = st.columns(2)
+            with dynamic_col1:
+                for key in ['Heart Rate', 'Non Invasive Blood Pressure diastolic']:
+                    value = st.number_input(f'{key} (Timestep {t + 1})', min_value=0.0, max_value=200.0, step=0.1,
+                                            key=f"{key}_{t}")
+                    timeseries_data[key].append(value)
+            with dynamic_col2:
+                for key in ['Non Invasive Blood Pressure mean', 'Non Invasive Blood Pressure systolic', 'Respiratory Rate']:
+                    value = st.number_input(f'{key} (Timestep {t + 1})', min_value=0.0, max_value=200.0, step=0.1,
+                                            key=f"{key}_{t}")
+                    timeseries_data[key].append(value)
+
+        # Convert inputs to DataFrame
+        static_df = pd.DataFrame([static_input], columns=["AGE", 'Admission Weight (Kg)', "Height (cm)"])
+        dynamic_df = pd.DataFrame(timeseries_data)
+
+        # Add a fake HADM_ID column to use the dynamic_scale function
+        dynamic_df['HADM_ID'] = 1
+
+        # Preprocess the input data
+        static_df, scaler = static_scale(static_df)
+        dynamic_df = dynamic_scale(dynamic_df)
+
+        # Drop the fake HADM_ID column
+        dynamic_df = dynamic_df.drop(columns=['HADM_ID'])
+
+        # Convert to numpy arrays
+        static_input = static_df.values
+        timeseries_input = dynamic_df.values.reshape(1, prediction_days, -1)
+        

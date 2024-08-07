@@ -1,0 +1,9 @@
+streamlit
+tensorflow
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
+keras-tuner
+streamlit-option-menu
