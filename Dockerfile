@@ -17,6 +17,7 @@ RUN pip install --no-cache-dir -r Requirements.txt
 
 # Copy only the Streamlit.py file and the Ressources folder
 COPY Streamlit.py .
+COPY Preprocessing.py . 
 COPY Ressources ./Ressources
 
 # Expose the port the app runs on
